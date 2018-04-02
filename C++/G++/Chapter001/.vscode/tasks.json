@@ -1,0 +1,39 @@
+{
+    "version": "0.1.0",
+    "showOutput": "always",
+    "echoCommand": true,
+    "tasks": [
+        {
+            "taskName":"GPPCompile",
+            "command": "g++",
+            "args": [
+                "-W",
+                "-Wall",
+                "-c",
+                "${file}"
+            ],
+            "isShellCommand": true
+        },
+        {
+            "taskName": "GPPBuild",
+            "command":"g++",
+            "args": [
+                "-W",
+                "-Wall",
+                "-o",
+                "${fileBasenameNoExtension}",
+                "*.o"
+            ],
+            "isShellCommand": true
+        },
+        {
+            "taskName": "Clean",
+            "command": "powershell",
+            "args": [
+                "rm",
+                "*.o"
+            ],
+            "isShellCommand": true
+        }
+    ]
+}

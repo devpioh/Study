@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "C:/Python/python.exe",
+    "python.linting.pylintArgs": [
+        "--rcfile",
+        "pylint.config",
+        "--disalbe",
+        "missing-docstring"
+    ]
+}

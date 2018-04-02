@@ -1,0 +1,11 @@
+.DS_Store
+*~
+*.gz
+*.pyc
+__pycache__/
+
+#visual studo#
+*.vs
+*.user
+*.suo
+Debug
