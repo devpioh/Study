@@ -8,4 +8,5 @@ __pycache__/
 *.vs
 *.user
 *.suo
+*.exe
 Debug
