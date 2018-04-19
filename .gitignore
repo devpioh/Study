@@ -10,3 +10,12 @@ __pycache__/
 *.suo
 *.exe
 Debug
+
+#Unity#
+*.sln
+obj
+.vscode
+Library
+Temp
+test
+
