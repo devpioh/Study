@@ -10,12 +10,12 @@
 
 void main()
 {
-	Point pos1(1, 2);
-	Point pos2(2, 4);
-	PointOP op;
+	// Point pos1(1, 2);
+	// Point pos2(2, 4);
+	// PointOP op;
 
-	ShowPointPos(op.PointAdd(pos1, pos2));
-	ShowPointPos(op.PointSub(pos2, pos1));
+	// ShowPointPos(op.PointAdd(pos1, pos2));
+	// ShowPointPos(op.PointSub(pos2, pos1));
 
 	// NameCard manClerk("Lee", "010-1111-2222", "ABCEng", COMP_POS::CLERK);
 	// NameCard manSenior("Hong", "010-3333-4444", "OrangeEng", COMP_POS::SENIOR);
