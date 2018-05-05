@@ -10,8 +10,7 @@
                 "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include/c++/mingw32",
                 "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include/c++/backward",
                 "C:/MINGW/include",
-                "C:/MINGW/lib/gcc/mingw32/6.3.0/include-fixed",
-                "${workspaceFolder}/Chapter006/ConstAndFriend"
+                "C:/MINGW/lib/gcc/mingw32/6.3.0/include-fixed"
             ],
             "defines": [
                 "_DEBUG",
