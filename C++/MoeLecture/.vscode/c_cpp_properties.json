@@ -3,13 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFoloder}",
                 "${workspaceRoot}",
-                "${env:MINGW_INCLUDE}",
-                "${env:MINGW_INCLUDE}/c++",
-                "${env:MINGW_INCLUDE}/c++/mingw32",
-                "${env:MINGW_INCLUDE}/c++/backward",
+                "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include",
+                "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include/c++",
+                "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include/c++/mingw32",
+                "C:\\MinGW\\lib\\gcc\\mingw32\\6.3.0\\include/c++/backward",
                 "C:/MINGW/include",
-                "C:/MINGW/lib/gcc/mingw32/6.3.0/include-fixed"
+                "C:/MINGW/lib/gcc/mingw32/6.3.0/include-fixed",
+                "${workspaceFolder}/Chapter006/ConstAndFriend"
             ],
             "defines": [
                 "_DEBUG",
@@ -24,6 +26,7 @@
                     "C:/MinGW/lib/gcc/mingw32/6.3.0/include",
                     "C:/MinGW/lib/gcc/mingw32/6.3.0/include-fixed",
                     "C:/MinGW/include/*",
+                    "${workspaceRoot}",
                     "${workspaceRoot}/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
