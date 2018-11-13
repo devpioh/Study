@@ -10,6 +10,8 @@
 
 void main()
 {
+	std::cout<<"hello world"<<std::endl;
+
 	// Point pos1(1, 2);
 	// Point pos2(2, 4);
 	// PointOP op;
