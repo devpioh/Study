@@ -12,6 +12,13 @@ public enum HexDirection
 	NW
 }
 
+public enum HexEdgeType
+{
+	Flat,
+	Slope,
+	Cliff
+}
+
 public static class HexDirectionExtensions
 {
 	public static HexDirection Opposite( this HexDirection direction )
