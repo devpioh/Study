@@ -19,7 +19,7 @@ public class HexMapEditor : MonoBehaviour
 	
 	private void Update()
 	{
-		if( Input.GetMouseButton(0) )
+		if( Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject() )
 		{
 			HandleInput();
 		}
@@ -30,9 +30,9 @@ public class HexMapEditor : MonoBehaviour
 		Ray inputRay = Camera.main.ScreenPointToRay( Input.mousePosition );
 		RaycastHit hit;
 
-		if( Physics.Raycast(inputRay, out hit ) )//&& !EventSystem.current.IsPointerOverGameObject() )
+		if( Physics.Raycast(inputRay, out hit ) )
 		{
-			// hexGrid.TouchCell( hit.point, activeColor );
+			 //hexGrid.TouchCell( hit.point, activeColor );
 			EditCell( hexGrid.GetCell(hit.point) );
 		}
 	}

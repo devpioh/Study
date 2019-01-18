@@ -51,7 +51,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\DiceAsset\Plugins\Dice.cs" />
+     <Compile Include="Assets\DiceAsset\Plugins\Die.cs" />
+     <Compile Include="Assets\DiceAsset\scenes\Demo\AppDemo.cs" />
+     <Compile Include="Assets\DiceAsset\Scripts\Dice\Die_d10.cs" />
+     <Compile Include="Assets\DiceAsset\Scripts\Dice\Die_d6.cs" />
      <Compile Include="Assets\Script\Camera\MeshDeformerInput.cs" />
+     <Compile Include="Assets\Script\Dice\D20.cs" />
+     <Compile Include="Assets\Script\Dice\D4.cs" />
+     <Compile Include="Assets\Script\Dice\D6.cs" />
+     <Compile Include="Assets\Script\Dice\DiceMetrics.cs" />
      <Compile Include="Assets\Script\Enumers.cs" />
      <Compile Include="Assets\Script\Tile\BuildGrid.cs" />
      <Compile Include="Assets\Script\Tile\Cell.cs" />
@@ -61,6 +70,7 @@
      <Compile Include="Assets\Script\Tile\HexMapEditor.cs" />
      <Compile Include="Assets\Script\Tile\HexMesh.cs" />
      <Compile Include="Assets\Script\Tile\HexMetric.cs" />
+     <None Include="Assets\DiceAsset\-Read-Me-.txt" />
      <None Include="Assets\Material\VertexColor.shader" />
      <None Include="Assets\Material\VertexColorsTest.shader" />
  <Reference Include="UnityEngine.CoreModule">

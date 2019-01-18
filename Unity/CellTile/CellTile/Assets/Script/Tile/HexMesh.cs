@@ -62,33 +62,13 @@ public class HexMesh : MonoBehaviour
 		AddTriangle( center, v1, v2 );
 		AddTriangleColor( cell.color );
 
-		//if( HexDirection.NE == direction )
 		if( HexDirection.SE >= direction )
 		{
-			TriangluateConnection( direction, cell, v1, v2 );
+			TriangulateConnection( direction, cell, v1, v2 );
 		}
-
-		// Vector3 bridge		= HexMetrics.GetBridge( direction );
-		// Vector3 v3			= v1 + bridge;
-		// Vector3 v4			= v2 + bridge;
-
-		// AddQuad( v1, v2, v3, v4 );
-
-		// var prevNeighbor	= cell.GetNeighbor( direction.Previous() ) ?? cell;
-		// var neighbor		= cell.GetNeighbor( direction ) ?? cell;
-		// var nextNeighbor	= cell.GetNeighbor( direction.Next() ) ?? cell;
-		// var bridgeColor		= (cell.color + neighbor.color) * 0.5f;
-
-		// AddQuadColor( cell.color, bridgeColor );
-
-		// AddTriangle( v1, center + HexMetrics.GetFirstCorner(direction), v3 );
-		// AddTriangleColor( cell.color, (cell.color + prevNeighbor.color + neighbor.color) / 3f, bridgeColor );
-
-		// AddTriangle( v2, v4, center + HexMetrics.GetSecondCorner(direction) );
-		// AddTriangleColor( cell.color, bridgeColor, (cell.color + neighbor.color + nextNeighbor.color) / 3f );
 	}
 
-	private void TriangluateConnection( HexDirection direction, HexCell cell, Vector3 v1, Vector3 v2 )
+	private void TriangulateConnection( HexDirection direction, HexCell cell, Vector3 v1, Vector3 v2 )
 	{
 		HexCell neighbor	= cell.GetNeighbor( direction );
 		if( null == neighbor )
@@ -99,11 +79,7 @@ public class HexMesh : MonoBehaviour
 		Vector3 bridge		= HexMetrics.GetBridge( direction );
 		Vector3 v3			= v1 + bridge;
 		Vector3 v4			= v2 + bridge;
-		v3.y = v4.y	= neighbor.Elevation * HexMetrics.elevationStep;
-
-		// AddQuad( v1, v2, v3, v4 );
-		// AddQuadColor( cell.color, neighbor.color );
-		// TriangulateEdgeTerraces( v1, v2, cell, v3, v4, neighbor );
+		v3.y = v4.y			= neighbor.Elevation * HexMetrics.elevationStep;
 
 		if( HexEdgeType.Slope == cell.GetEdgeType(direction) )
 		{
@@ -121,8 +97,6 @@ public class HexMesh : MonoBehaviour
 			Vector3 v5	= v2 + HexMetrics.GetBridge( direction.Next() );
 			v5.y		= nextNeighbor.Elevation * HexMetrics.elevationStep;
 
-			// AddTriangle( v2, v4, v5 );
-			// AddTriangleColor( cell.color, neighbor.color, nextNeighbor.color );
 			if( cell.Elevation <= neighbor.Elevation )
 			{
 				if( cell.Elevation <= nextNeighbor.Elevation )
@@ -180,13 +154,44 @@ public class HexMesh : MonoBehaviour
 			if( HexEdgeType.Slope == rightEdgeType )
 			{
 				TriangulateCornerTerraces( bottom, bottomCell, left, leftCell, right, rightCell );
-				return;
+			}
+			else if( HexEdgeType.Flat == rightEdgeType )
+			{
+				TriangulateCornerTerraces( left, leftCell, right, rightCell, bottom, bottomCell );
+			}
+			else
+			{
+				TriangulateCornerTerracesCliff( bottom, bottomCell, left, leftCell, right, rightCell );	
 			}
 		}
-
-
-		AddTriangle( bottom, left, right );
-		AddTriangleColor( bottomCell.color, leftCell.color, rightCell.color );
+		else if( HexEdgeType.Slope == rightEdgeType )
+		{
+			if( HexEdgeType.Flat == leftEdgeType )
+			{
+				TriangulateCornerTerraces( right, rightCell, bottom, bottomCell, left, leftCell );
+				return;
+			}
+			else
+			{
+				TriangulateCornerCliffTerraces( bottom, bottomCell, left, leftCell, right, rightCell );	
+			}
+		}
+		else if( HexEdgeType.Slope == leftCell.GetEdgeType( rightCell ) )
+		{
+			if( leftCell.Elevation < rightCell.Elevation )
+			{
+				TriangulateCornerCliffTerraces( right, rightCell, bottom, bottomCell, left, leftCell );
+			}
+			else
+			{
+				TriangulateCornerTerracesCliff( left, leftCell, right, rightCell, bottom, bottomCell );
+			}
+		}
+		else
+		{
+			AddTriangle( bottom, left, right );
+			AddTriangleColor( bottomCell.color, leftCell.color, rightCell.color );	
+		}
 	}
 
 	private void TriangulateCornerTerraces( Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell, Vector3 right, HexCell rightCell )
@@ -218,6 +223,72 @@ public class HexMesh : MonoBehaviour
 
 		AddQuad( v3, v4, left, right );
 		AddQuadColor( c3, c4, leftCell.color, rightCell.color );
+	}
+
+	private void TriangulateCornerTerracesCliff( Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell, Vector3 right, HexCell rightCell )
+	{
+		float b				= 1f / (rightCell.Elevation - beginCell.Elevation );
+		if( b < 0 )			{ b = -b; }
+
+		Vector3 boundary	= Vector3.Lerp( begin, right, b );
+		Color boundaryColor	= Color.Lerp( beginCell.color, rightCell.color, b );
+
+		TriangulateBoundaryTriangle( begin, beginCell, left, leftCell, boundary, boundaryColor );
+
+		if( HexEdgeType.Slope == leftCell.GetEdgeType(rightCell) )
+		{
+			TriangulateBoundaryTriangle( left, leftCell, right, rightCell, boundary, boundaryColor );
+		}
+		else
+		{
+			AddTriangle( left, right, boundary );
+			AddTriangleColor( leftCell.color, rightCell.color, boundaryColor );
+		}
+	}
+
+	private void TriangulateCornerCliffTerraces( Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell, Vector3 right, HexCell rightCell )
+	{
+		float b				= 1f / (leftCell.Elevation - beginCell.Elevation );
+		if( b < 0 )			{ b = -b; }
+		Vector3 boundary	= Vector3.Lerp( begin, left, b );
+		Color boundaryColor	= Color.Lerp( beginCell.color, leftCell.color, b );
+
+		TriangulateBoundaryTriangle( right, rightCell, begin, beginCell, boundary, boundaryColor );
+
+		if( HexEdgeType.Slope == leftCell.GetEdgeType(rightCell) )
+		{
+			TriangulateBoundaryTriangle( left, leftCell, right, rightCell, boundary, boundaryColor );
+		}
+		else
+		{
+			AddTriangle( left, right, boundary );
+			AddTriangleColor( leftCell.color, rightCell.color, boundaryColor );
+		}
+	}
+
+
+	private void TriangulateBoundaryTriangle( Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell, Vector3 boundary, Color boundaryColor )
+	{
+		Vector3 v2			= HexMetrics.TerraceLerp( begin, left, 1);
+		Color c2			= HexMetrics.TerraceLerp( beginCell.color, leftCell.color, 1 );
+
+		AddTriangle( begin, v2, boundary );
+		AddTriangleColor( beginCell.color, c2, boundaryColor );
+
+		for( int i = 2; i < HexMetrics.terracesSteps; i++ )
+		{
+			Vector3 v1 = v2;
+			Color c1 = c2;
+
+			v2 = HexMetrics.TerraceLerp( begin, left, i );
+			c2 = HexMetrics.TerraceLerp( beginCell.color, leftCell.color, i );
+
+			AddTriangle( v1, v2, boundary );
+			AddTriangleColor( c1, c2, boundaryColor );
+		}
+
+		AddTriangle( v2, left, boundary );
+		AddTriangleColor( c2, leftCell.color, boundaryColor );
 	}
 
 	private void AddTriangle( Vector3 v1, Vector3 v2, Vector3 v3 )

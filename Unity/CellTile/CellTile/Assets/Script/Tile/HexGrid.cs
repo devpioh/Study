@@ -41,19 +41,7 @@ public class HexGrid : MonoBehaviour
 	{
 		hexMesh.Triangulate(cells);
 	}
-
-	public void TouchCell( Vector3 position, Color color )
-	{
-		position					= transform.InverseTransformPoint( position );
-        HexCoordinates coordinates	= HexCoordinates.FromPosition( position );
-		int index					= coordinates.X + coordinates.Z * width + coordinates.Z / 2;
-		HexCell cell				= cells[index];
-		cell.color					= color;
-		hexMesh.Triangulate( cells );
-
-		// Debug.LogFormat( "Touched at : {0} : {1}", coordinates, position );
-	}
-
+	
 	public HexCell GetCell( Vector3 position )
 	{
 		position					= transform.InverseTransformPoint( position );
@@ -115,5 +103,18 @@ public class HexGrid : MonoBehaviour
 		cell.uiRect		= label.rectTransform;
 
 		cells[index]	= cell;
+	}
+	
+	
+	public void TouchCell( Vector3 position, Color color )
+	{
+		position					= transform.InverseTransformPoint( position );
+        HexCoordinates coordinates	= HexCoordinates.FromPosition( position );
+		int index					= coordinates.X + coordinates.Z * width + coordinates.Z / 2;
+		HexCell cell				= cells[index];
+		cell.color					= color;
+		hexMesh.Triangulate( cells );
+
+		Debug.LogFormat( "Touched at : {0} : {1} : {2}", coordinates, position, color );
 	}
 }
