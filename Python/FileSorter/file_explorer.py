@@ -2,6 +2,7 @@
 import os
 import sys
 import io
+import file_structure
 
 class FileExplorer:
     def __init__(self):
@@ -53,7 +54,7 @@ class FileExplorer:
 
             print( "MAKE REPORT PATH : " + reportDist )
             
-            with open( reportDist, "w" ) as f:
+            with open( reportDist, "w", encoding="UTF-8", newline="" ) as f:
                 for key, values in self.fileDirectory.items():
                     # print( "path : " + key )
                     f.writelines( "path : " + key + "\n" )
@@ -65,12 +66,5 @@ class FileExplorer:
                     for value in values:
                         # print( " - " + value )
                         f.writelines( " - " + value + "\n" )
-        except Exception:
-            print( "ERROR!!!" )
-            
-
-if __name__ == "__main__":
-    explorer = FileExplorer()
-    explorer.Search( "c:/users/mygoo/downloads" )
-    explorer.DisplaySearchFiles()
-    # explorer.ExportSearchReport( "d:/Temptory" )
+        except Exception as e:
+            print( e )
