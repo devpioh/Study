@@ -9,10 +9,12 @@ class FileExplorer:
         self.fileTypes = dict()
         self.files = dict()
         self.reportName = "SearchReport.txt"
+        self.statingDir = ""
 
     def Search(self, dirname):
         print("Start Serarch : " + dirname)
         try:
+            self.statingDir = dirname
             for(path, folders, files) in os.walk(dirname):
                 if folders in files:
                     files.remove(folders)
@@ -64,6 +66,12 @@ class FileExplorer:
             print( "MAKE REPORT PATH : " + reportDist )
             
             with open( reportDist, "w", encoding="UTF-8", newline="" ) as f:
+                f.writelines( "Explore Directory : " + self.statingDir + "\n" )
+                f.writelines( "[ File Extension Count ]\n")
+                for ext in self.files.keys():
+                    f.writelines( "%s : %d\n"% (ext, len(self.files[ext])) )
+
+                f.writelines( "[ File Path Info ]\n")
                 for key, values in self.fileDirectory.items():
                     # print( "path : " + key )
                     f.writelines( "path : " + key + "\n" )
