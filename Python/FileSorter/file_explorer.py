@@ -1,16 +1,17 @@
-
 import os
 import sys
 import io
-import file_structure
+from file_structure import FileInfo
 
 class FileExplorer:
     def __init__(self):
         self.fileDirectory = dict()
         self.fileTypes = dict()
+        self.files = dict()
         self.reportName = "SearchReport.txt"
 
     def Search(self, dirname):
+        print("Start Serarch : " + dirname)
         try:
             for(path, folders, files) in os.walk(dirname):
                 if folders in files:
@@ -25,15 +26,23 @@ class FileExplorer:
                     name, ext = os.path.splitext( filename )
                     if not ext in self.fileTypes[path]:
                         self.fileTypes[path][ext] = list()
+                    if not ext in self.files:
+                        self.files[ext] = list()
                     
                     self.fileTypes[path][ext].append( name )
+                    self.files[ext].append( FileInfo( path, name ) )
 
-        except PermissionError:
-            pass
+        except Exception as e:
+            print(e)
         
     def DisplaySearchFiles(self):
         print( "------------------ show ------------------")
 
+        print( "<<<< Extension Type And Count >>>>")
+        for ext in self.files.keys():
+            print("%s : %d" % (ext, len(self.files[ext])))
+
+        print( "<<<< Path Detail >>>>")
         for key, values in self.fileDirectory.items():
             print( "path : " + key )
 
