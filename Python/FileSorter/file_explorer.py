@@ -1,6 +1,7 @@
 import os
 import sys
 import io
+import shutil
 from file_structure import FileInfo
 
 class FileExplorer:
@@ -10,46 +11,75 @@ class FileExplorer:
         self.files = dict()
         self.reportName = "SearchReport.txt"
         self.statingDir = ""
+    
+    def Clear(self):
+        self.fileDirectory.clear()
+        self.fileTypes.clear()
+        self.files.clear()
+        self.statingDir = ""
 
-    def Search(self, dirname):
-        print("Start Serarch : " + dirname)
+    def CollectFile(self, dirname):
+        print("Start Collect : " + dirname)
+        if not os.path.exists( dirname ):
+           print( "Chek path or permission" ) 
+        else:
+            try:
+                self.statingDir = dirname
+                for(path, folders, files) in os.walk(dirname):
+                    if folders in files:
+                        files.remove(folders)
+
+                    if None == files or 0 == len(files) : continue
+                        
+                    self.fileDirectory[path] = files
+                    self.files[path] = list()
+
+                    for filename in files:
+                        name, ext = os.path.splitext( filename )
+                        if not ext in self.fileTypes:
+                            self.fileTypes[ext] = int()
+
+                        self.fileTypes[ext] += 1
+                        self.files[path].append( FileInfo( path, filename ) )
+
+            except Exception as e:
+                print(e)
+    
+    def DeleteFiles(self):
+        pass
+
+    def DeleteDirectory(self):
+        pass
+
+    def MoveFiles(self, keyPath, targetPath):
         try:
-            self.statingDir = dirname
-            for(path, folders, files) in os.walk(dirname):
-                if folders in files:
-                    files.remove(folders)
-
-                if None == files or 0 == len(files) : continue
-                    
-                self.fileDirectory[path] = files
-                self.fileTypes[path] = dict()
-
-                for filename in files:
-                    name, ext = os.path.splitext( filename )
-                    if not ext in self.fileTypes[path]:
-                        self.fileTypes[path][ext] = list()
-                    if not ext in self.files:
-                        self.files[ext] = list()
-                    
-                    self.fileTypes[path][ext].append( name )
-                    self.files[ext].append( FileInfo( path, name ) )
-
+            if not self.fileDirectory in keyPath:
+                print("none collect path : " + keyPath )
+                return
+             
+            if not os.path.exists( targetPath ):
+                print( "make directory : " + targetPath )
+                os.mkdir( targetPath )
+        
+            moveFiles = self.fileDirectory[keyPath]
+            
         except Exception as e:
             print(e)
+    
+    def MoveDirectory(self):
+        pass
+
         
-    def DisplaySearchFiles(self):
+    def DisplayCollectFiles(self):
         print( "------------------ show ------------------")
 
         print( "<<<< Extension Type And Count >>>>")
-        for ext in self.files.keys():
-            print("%s : %d" % (ext, len(self.files[ext])))
+        for ext in self.fileTypes:
+            print("%s : %d" % (ext, self.fileTypes[ext]))
 
         print( "<<<< Path Detail >>>>")
         for key, values in self.fileDirectory.items():
             print( "path : " + key )
-
-            for extKey, extValue in self.fileTypes[key].items():
-                print( ("%s : %d" % (extKey, len(extValue))) )
 
             for value in values:
                 print( " - " + value )
@@ -68,20 +98,14 @@ class FileExplorer:
             with open( reportDist, "w", encoding="UTF-8", newline="" ) as f:
                 f.writelines( "Explore Directory : " + self.statingDir + "\n" )
                 f.writelines( "[ File Extension Count ]\n")
-                for ext in self.files.keys():
-                    f.writelines( "%s : %d\n"% (ext, len(self.files[ext])) )
+                for ext in self.fileTypes:
+                    f.writelines( "%s : %d\n"% (ext, self.fileTypes[ext]) )
 
                 f.writelines( "[ File Path Info ]\n")
                 for key, values in self.fileDirectory.items():
-                    # print( "path : " + key )
                     f.writelines( "path : " + key + "\n" )
-                    
-                    for extKey, extValue in self.fileTypes[key].items():
-                        # print( ("%s : %d" % (extKey, len(extValue))) )
-                        f.writelines( ("%s : %d \n" % (extKey, len(extValue))) )
-                        
+
                     for value in values:
-                        # print( " - " + value )
                         f.writelines( " - " + value + "\n" )
         except Exception as e:
             print( e )
