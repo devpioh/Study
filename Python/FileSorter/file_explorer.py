@@ -2,7 +2,7 @@ import os
 import sys
 import io
 import shutil
-from file_structure import FileInfo
+from file_structure import *
 
 class FileExplorer:
     def __init__(self):
@@ -53,7 +53,7 @@ class FileExplorer:
 
     def MoveFiles(self, keyPath, targetPath):
         try:
-            if not self.fileDirectory in keyPath:
+            if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
                 return
              
@@ -62,7 +62,61 @@ class FileExplorer:
                 os.mkdir( targetPath )
         
             moveFiles = self.fileDirectory[keyPath]
+            moveInfos = self.files[keyPath]
+
+            for mt in moveInfos:
+                dist = os.path.join( targetPath, mt.name )
+                shutil.move( mt.fullPath, dist )
+
+                mt.fullPath = dist
+                mt.path = targetPath
+
+            del self.fileDirectory[keyPath]
+            del self.files[keyPath]
+
+            self.fileDirectory[targetPath] = moveFiles
+            self.files[targetPath] = moveInfos
+
+            os.rmdir(keyPath)
             
+        except Exception as e:
+            print(e)
+    
+    def MoveFilesForExt(self, keyPath, targetPath, ext):
+        try:
+            print( "%s, %s, %s" %(keyPath, targetPath, ext) )
+            
+            if not keyPath in self.fileDirectory:
+                print("none collect path : " + keyPath )
+                return
+            elif FileExt.none == FileInfo.enumExtension(ext.lower()):
+                print("none collect ext : %s" %  FileInfo.enumExtension(ext.lower()) )
+                return
+             
+            if not os.path.exists( targetPath ):
+                print( "make directory : " + targetPath )
+                os.mkdir( targetPath )
+
+            moveExt = FileInfo.enumExtension(ext.lower())
+            moveInfos = list()
+            moveFiles = list()
+
+            for mt in self.files[keyPath]:
+                if mt.ext == moveExt:
+                    dist = os.path.join( targetPath, mt.name )
+                    shutil.move( mt.fullPath, dist )
+
+                    mt.fullPath = dist
+                    mt.path = targetPath
+                    
+                    moveInfos.append( mt )
+                    moveFiles.append( mt.name )
+                    self.files[keyPath].remove( mt )
+                    self.fileDirectory[keyPath].remove( mt.name )
+            
+            self.fileDirectory[targetPath] = moveFiles
+            self.files[targetPath] = moveInfos
+
         except Exception as e:
             print(e)
     
@@ -71,7 +125,7 @@ class FileExplorer:
 
         
     def DisplayCollectFiles(self):
-        print( "------------------ show ------------------")
+        print( "------------------ Collected Files ------------------" )
 
         print( "<<<< Extension Type And Count >>>>")
         for ext in self.fileTypes:
@@ -84,8 +138,42 @@ class FileExplorer:
             for value in values:
                 print( " - " + value )
         
-        print( "------------------ end ------------------")
+        print( "------------------ Collected Files ------------------" )
 
+    def DisplayCollectPath(self):
+        print( "------------------ Collected Path ------------------" )
+        for path in self.fileDirectory:
+            print( path )
+        print( "------------------ Collected Path ------------------" )
+
+    def DisplayCollectExtension(self, path):
+        print( "------------------ Collected Extension ------------------" )    
+        if None == path or not path in self.fileDirectory:
+            print( "< All Extenstions >")
+            for ext in self.fileTypes:
+                print( "%s : %d" % (ext, self.fileTypes[ext]))
+        else:
+            print( "< Collect Extension Path : " + path + " >" )
+
+            types = dict()
+            for info in self.files[path]:
+                if not info.ext in types:
+                    types[info.ext] = 1
+                else:
+                    types[info.ext] += 1
+            
+            for ext in types:
+                print( "%s : %d" % (FileInfo.strExtension(ext), types[ext]))
+        print( "------------------ Collected Extension ------------------" )
+    
+    def DisplayCollectDetail(self):
+        print( "------------------ Collected Detail ------------------" )
+        for k, v in self.files.items():
+            print( "[ key path : " + k + " ]" )
+            for item in v:
+                print( item.toStr() )
+        print( "------------------ Collected Detail ------------------" )
+        
     def ExportSearchReport(self, exportPath):
         try:
             if not os.path.exists( exportPath ):
