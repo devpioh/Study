@@ -5,6 +5,14 @@ import shutil
 from file_structure import *
 
 class FileExplorer:
+    @staticmethod
+    def replaceDirSlash(dir):
+        if not None == dir:
+            dir = dir.replace( "\\", "/" )
+        
+        return dir
+
+
     def __init__(self):
         self.fileDirectory = dict()
         self.fileTypes = dict()
@@ -19,6 +27,7 @@ class FileExplorer:
         self.statingDir = ""
 
     def CollectFile(self, dirname):
+        dirname = FileExplorer.replaceDirSlash( dirname )
         print("Start Collect : " + dirname)
         if not os.path.exists( dirname ):
            print( "Chek path or permission" ) 
@@ -53,6 +62,9 @@ class FileExplorer:
 
     def MoveFiles(self, keyPath, targetPath):
         try:
+            keyPath = FileExplorer.replaceDirSlash(keyPath)
+            targetPath = FileExplorer.replaceDirSlash(targetPath)
+            print( "move file : %s, %s" %(keyPath, targetPath) )
             if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
                 return
@@ -84,7 +96,9 @@ class FileExplorer:
     
     def MoveFilesForExt(self, keyPath, targetPath, ext):
         try:
-            print( "%s, %s, %s" %(keyPath, targetPath, ext) )
+            keyPath = FileExplorer.replaceDirSlash(keyPath)
+            targetPath = FileExplorer.replaceDirSlash(targetPath)
+            print( "move file : %s, %s, %s" %(keyPath, targetPath, ext) )
             
             if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
@@ -98,8 +112,15 @@ class FileExplorer:
                 os.mkdir( targetPath )
 
             moveExt = FileInfo.enumExtension(ext.lower())
-            moveInfos = list()
-            moveFiles = list()
+
+            if not targetPath in self.fileDirectory:
+                self.fileDirectory[targetPath] = list()
+
+            if not targetPath in self.files:
+                self.files[targetPath] = list()
+            
+            moveInfos = self.files[targetPath]
+            moveFiles = self.fileDirectory[targetPath]
 
             for mt in self.files[keyPath]:
                 if mt.ext == moveExt:
@@ -113,9 +134,6 @@ class FileExplorer:
                     moveFiles.append( mt.name )
                     self.files[keyPath].remove( mt )
                     self.fileDirectory[keyPath].remove( mt.name )
-            
-            self.fileDirectory[targetPath] = moveFiles
-            self.files[targetPath] = moveInfos
 
         except Exception as e:
             print(e)

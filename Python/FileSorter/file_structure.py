@@ -34,8 +34,12 @@ class FileInfo:
 
     @staticmethod
     def enumExtension(fileName):
-        name, ext = os.path.splitext(fileName)
-        print( "split ext : " + ext )
+        ext = fileName
+        if not "." == ext[0]:
+            name, extension = os.path.splitext(ext)
+            ext = extension
+        
+        # print( "split ext : " + ext )
 
         if "" == ext or None == ext:    return FileExt.none
         elif ".txt" == ext:             return FileExt.txt
