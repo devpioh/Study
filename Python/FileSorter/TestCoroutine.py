@@ -13,19 +13,22 @@ class job:
     async def work(self):
         print("start : %d" % self.value)
         await asyncio.sleep(self.value)
-        print("end : %d" % self.value)
+        # print("end : %d" % self.value)
         return self.value
 
 async def jobLoop(works):
     for w in asyncio.as_completed(works):
         c = await w
-    
-    print("finished jobs")
 
 async def progressBar(works):
-    # for w in tqdm( asyncio.as_completed(works), total=len(works) ):
-    for w in tqdm( works, total=len(works) ):
+    for w in tqdm( asyncio.as_completed(works), total=len(works) ):
+    # for w in tqdm( works, total=len(works) ):
         await w
+
+    # progressBar = tqdm( asyncio.as_completed(works), total=len(works) )
+    
+    # while not asyncio.as_completed( progressBar ):
+    #     await progressBar
 
 works = list()
 for i in range( 1, 6 ):
