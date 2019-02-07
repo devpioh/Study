@@ -137,6 +137,19 @@ class FileExplorer:
 
         except Exception as e:
             print(e)
+
+    def copyFileObj( self, src, dst, callback_done, length=8*1024 ):
+        with open(src, "r") as fsrc:
+            with open(dst, "w") as fdst:
+                copied = 0
+                while True:
+                    buf = fsrc.read(length)
+                    if not buf:
+                        break
+                    fdst.write(buf)
+                    copied += len(buf)
+                callback_done(fsrc=fsrc, fdst=fdst, copied=copied)
+
     
     def MoveDirectory(self):
         pass
