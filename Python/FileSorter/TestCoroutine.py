@@ -32,7 +32,8 @@ async def progressBar(works):
 
 works = list()
 for i in range( 1, 6 ):
-    j = job( random.randint(i, 6) )
+    # j = job( random.randint(i, 6) )
+    j = job( i )
     works.append( asyncio.ensure_future(j.work()) )
 
 loop = asyncio.get_event_loop()

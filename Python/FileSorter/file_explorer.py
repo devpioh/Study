@@ -2,6 +2,8 @@ import os
 import sys
 import io
 import shutil
+import asyncio
+from tqdm import tqdm
 from file_structure import *
 
 class FileExplorer:
@@ -19,12 +21,19 @@ class FileExplorer:
         self.files = dict()
         self.reportName = "SearchReport.txt"
         self.statingDir = ""
+        self.loop = asyncio.get_event_loop()
+        self.fts = list()
     
     def Clear(self):
         self.fileDirectory.clear()
         self.fileTypes.clear()
         self.files.clear()
+        self.fts.clear()
         self.statingDir = ""
+        self.loop.close()
+
+    def isBusy(self):
+        return not self.loop and self.loop.is_running()
 
     def CollectFile(self, dirname):
         dirname = FileExplorer.replaceDirSlash( dirname )
@@ -39,7 +48,9 @@ class FileExplorer:
                         files.remove(folders)
 
                     if None == files or 0 == len(files) : continue
-                        
+
+                    path = FileExplorer.replaceDirSlash( path )
+
                     self.fileDirectory[path] = files
                     self.files[path] = list()
 
@@ -138,9 +149,60 @@ class FileExplorer:
         except Exception as e:
             print(e)
 
+    def CopyFilesForExt(self, keyPath, targetPath, ext):
+        try:
+            keyPath = FileExplorer.replaceDirSlash(keyPath)
+            targetPath = FileExplorer.replaceDirSlash(targetPath)
+            print( "move file : %s, %s, %s" %(keyPath, targetPath, ext) )
+            
+            if not keyPath in self.fileDirectory:
+                print("none collect path : " + keyPath )
+                return
+            elif FileExt.none == FileInfo.enumExtension(ext.lower()):
+                print("none collect ext : %s" %  FileInfo.enumExtension(ext.lower()) )
+                return
+             
+            if not os.path.exists( targetPath ):
+                print( "make directory : " + targetPath )
+                os.mkdir( targetPath )
+
+            moveExt = FileInfo.enumExtension(ext.lower())
+
+            if not targetPath in self.fileDirectory:
+                self.fileDirectory[targetPath] = list()
+
+            if not targetPath in self.files:
+                self.files[targetPath] = list()
+        
+            for mt in self.files[keyPath]:
+                if mt.ext == moveExt:
+                    dist = os.path.join( targetPath, mt.name )
+                    self.fts.append( asyncio.ensure_future( self.asyncCopyFileObj(mt.fullPath, dist, self.copyDone) ) )
+            
+            self.loop.run_until_complete( asyncio.gather( self.futureWorker(), self.progressWorker() ) )
+
+        except Exception as e:
+            print(e)
+
+    async def futureWorker(self):
+        for f in asyncio.as_completed( self.fts ):
+            await f
+
+    async def progressWorker(self):
+        for t in tqdm( asyncio.as_completed(self.fts), total=len(self.fts) ):
+            await t
+
+    def copyDone( self, src, dst, copied ):
+        name, ext   = os.path.splitext( dst )
+        path        = str(dst)
+        path        = path.replace( "/"+ name + ext, "" )
+
+        print( "copied file -> path : %s, name : %s, ext : %s, size : %d" %(path, name, ext, copied) )
+        pass
+
     def copyFileObj( self, src, dst, callback_done, length=8*1024 ):
-        with open(src, "r") as fsrc:
-            with open(dst, "w") as fdst:
+        with open(src, "r", encoding="UTF-8") as fsrc:
+            with open(dst, "w", encoding="UTF-8") as fdst:
                 copied = 0
                 while True:
                     buf = fsrc.read(length)
@@ -150,10 +212,21 @@ class FileExplorer:
                     copied += len(buf)
                 callback_done(fsrc=fsrc, fdst=fdst, copied=copied)
 
-    
-    def MoveDirectory(self):
-        pass
+    async def asyncCopyFileObj( self, src, dst, callback_done, length=8*1024 ):
+        with open(src, "rb", encoding="UTF-8") as fsrc:
+            with open(dst, "wb", encoding="UTF-8") as fdst:
+                copied = 0
 
+                while True:
+                    buf = await fsrc.read(length)
+                    if not buf:
+                        break
+                    fdst.write(buf)
+                    copied += len(buf)
+                    return copied
+                    
+                callback_done(src=src, dst=dst, copied=copied)
+                return copied
         
     def DisplayCollectFiles(self):
         print( "------------------ Collected Files ------------------" )
@@ -168,6 +241,19 @@ class FileExplorer:
 
             for value in values:
                 print( " - " + value )
+        
+        print( "------------------ Collected Files ------------------" )
+
+    def DisplayCollectFilesForPath(self, path):
+        if not path in self.fileDirectory:
+            print( "Check path plz : " + path )
+            return
+
+        print( "------------------ Collected Files ------------------" )
+        print( "path : " + path )
+
+        for fileName in self.fileDirectory[path]:
+            print( " - " + fileName )
         
         print( "------------------ Collected Files ------------------" )
 

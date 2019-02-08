@@ -13,6 +13,7 @@ def displayMenu():
     print("-------------- Menu --------------")
     print( "Collecting File       : cf <dir>\n" )
     print( "Display info          : (vf, vd, ve)\n" )
+    print( "Copy Files            : fc <src> <dst> <ext>\n" )
     print( "Collected File Clear  : cc\n" )
     print( "Move Collected File   : mvf <odir> <tdir> (ext)\n" )
     print( "Clear Display         : clear\n")
@@ -59,7 +60,10 @@ def selectMenu(ex, option):
         elif "cf" == option[0]:
             ex.CollectFile( option[1] )
         elif "vf" == option[0]:
-            ex.DisplayCollectFiles()
+            if 1 < len(option):
+                ex.DisplayCollectFilesForPath( option[1] )
+            else:
+                ex.DisplayCollectFiles()
         elif "vfd" == option[0]:
             ex.DisplayCollectDetail()
         elif "vd" == option[0]:
@@ -69,6 +73,8 @@ def selectMenu(ex, option):
                 ex.DisplayCollectExtension( option[1] )
             else:
                 ex.DisplayCollectExtension( None )
+        elif "fc" == option[0]:
+            ex.CopyFilesForExt( option[1], option[2], option[3] )
         elif "cc" == option[0]:
             ex.Clear()
         elif "mvf" == option[0]:
@@ -77,6 +83,7 @@ def selectMenu(ex, option):
             else:
                 ex.MoveFiles( option[1], option[2] )
         elif "quit" == option[0] or "q" == option[0]:
+            ex.Clear()
             sys.exit()
         elif "clear" == option[0]:
             if "Windows" == platform.system():
@@ -96,9 +103,12 @@ if __name__ == "__main__":
         p2 = re.compile( ".+\"$")
         p3 = re.compile( "^\".+\"$")
         while True:
-            displayMain()
-            argv = combinOption( input().split(), p1, p2, p3 )
-            selectMenu( finder, argv )
+            if finder.isBusy():
+                pass
+            else:
+                displayMain()
+                argv = combinOption( input().split(), p1, p2, p3 )
+                selectMenu( finder, argv )
     except Exception as e:
         print(e)
     
