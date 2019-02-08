@@ -11,13 +11,14 @@ def displayMain():
 
 def displayMenu():
     print("-------------- Menu --------------")
-    print( "Collecting File       : cf <dir>\n" )
-    print( "Display info          : (vf, vd, ve)\n" )
-    print( "Copy Files            : fc <src> <dst> <ext>\n" )
-    print( "Collected File Clear  : cc\n" )
-    print( "Move Collected File   : mvf <odir> <tdir> (ext)\n" )
-    print( "Clear Display         : clear\n")
-    print( "Exit                  : quit(q)\n" )
+    print( "System terminal       : -sys (ls, ...)" )
+    print( "Collecting File       : -col <dir>" )
+    print( "Display info          : -view (file <dir>, dir, ext <dir>)" )
+    print( "Copy Files            : -copy <src> <dst> <ext>" )
+    print( "Collected File Clear  : -empty" )
+    print( "Move Collected File   : -move <src> <dst> (ext)" )
+    print( "Clear Terminal        : clear" )
+    print( "Exit                  : quit(q)" )
 
 def combinOption( options, *p ):
     argv = list()
@@ -57,39 +58,61 @@ def selectMenu(ex, option):
     try:
         if "menu" == option[0]:
             displayMenu()
-        elif "cf" == option[0]:
+        elif "-sys" == option[0]:
+            argv = ""
+            
+            if "Windows" == platform.system():
+                if "ls" == option[1]:
+                    option[1] = "dir"
+                elif "clear" == option[1]:
+                    option[1] = "cls"
+            
+            for i in range( 1, len(option) ):
+                argv = argv + " " + option[i]
+
+            os.system( argv )
+
+        elif "-col" == option[0]:
             ex.CollectFile( option[1] )
-        elif "vf" == option[0]:
-            if 1 < len(option):
-                ex.DisplayCollectFilesForPath( option[1] )
-            else:
-                ex.DisplayCollectFiles()
-        elif "vfd" == option[0]:
-            ex.DisplayCollectDetail()
-        elif "vd" == option[0]:
-            ex.DisplayCollectPath()
-        elif "ve" == option[0]:
-            if 1 < len(option):
-                ex.DisplayCollectExtension( option[1] )
-            else:
-                ex.DisplayCollectExtension( None )
-        elif "fc" == option[0]:
+
+        elif "-view" == option[0]:
+            if "file" == option[1]:
+                if 2 < len(option):
+                    ex.DisplayCollectFilesForPath( option[2] )
+                else:
+                    ex.DisplayCollectFiles()
+            elif "dir" == option[1]:
+                ex.DisplayCollectPath()
+            elif "ext" == option[1]:
+                if 2 < len(option):
+                    ex.DisplayCollectExtension( option[2] )
+                else:
+                    ex.DisplayCollectExtension( None )
+            elif "detail" == option[1]:
+                ex.DisplayCollectDetail()
+
+        elif "-copy" == option[0]:
             ex.CopyFilesForExt( option[1], option[2], option[3] )
-        elif "cc" == option[0]:
-            ex.Clear()
-        elif "mvf" == option[0]:
+
+        elif "-move" == option[0]:
             if 3 < len(option):
                 ex.MoveFilesForExt( option[1], option[2], option[3] )
             else:
                 ex.MoveFiles( option[1], option[2] )
+
+        elif "-empty" == option[0]:
+            ex.Clear()
+
+        elif "clear" == option[0]:
+            if "Windows" == platform.system():
+                os.system( "cls" )
+            else:
+                os.system( "clear" )
+
         elif "quit" == option[0] or "q" == option[0]:
             ex.Clear()
             sys.exit()
-        elif "clear" == option[0]:
-            if "Windows" == platform.system():
-                os.system("cls")
-            else:
-                os.system("clear")
+
         else:
             print("Check argument")
                         

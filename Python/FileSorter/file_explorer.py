@@ -196,13 +196,11 @@ class FileExplorer:
         name, ext   = os.path.splitext( dst )
         path        = str(dst)
         path        = path.replace( "/"+ name + ext, "" )
-
         print( "copied file -> path : %s, name : %s, ext : %s, size : %d" %(path, name, ext, copied) )
-        pass
 
     def copyFileObj( self, src, dst, callback_done, length=8*1024 ):
-        with open(src, "r", encoding="UTF-8") as fsrc:
-            with open(dst, "w", encoding="UTF-8") as fdst:
+        with open(src, "rb") as fsrc:
+            with open(dst, "wb") as fdst:
                 copied = 0
                 while True:
                     buf = fsrc.read(length)
@@ -213,20 +211,18 @@ class FileExplorer:
                 callback_done(fsrc=fsrc, fdst=fdst, copied=copied)
 
     async def asyncCopyFileObj( self, src, dst, callback_done, length=8*1024 ):
-        with open(src, "rb", encoding="UTF-8") as fsrc:
-            with open(dst, "wb", encoding="UTF-8") as fdst:
+        with open(src, "rb") as fsrc:
+            with open(dst, "wb") as fdst:
                 copied = 0
 
                 while True:
-                    buf = await fsrc.read(length)
+                    buf = fsrc.read(length)
                     if not buf:
                         break
                     fdst.write(buf)
                     copied += len(buf)
-                    return copied
-                    
+
                 callback_done(src=src, dst=dst, copied=copied)
-                return copied
         
     def DisplayCollectFiles(self):
         print( "------------------ Collected Files ------------------" )
