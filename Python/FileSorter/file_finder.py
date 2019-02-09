@@ -15,8 +15,9 @@ def displayMenu():
     print( "Collecting File       : -col <dir>" )
     print( "Display info          : -view (file <dir>, dir, ext <dir>)" )
     print( "Copy Files            : -copy <src> <dst> <ext>" )
-    print( "Collected File Clear  : -empty" )
     print( "Move Collected File   : -move <src> <dst> (ext)" )
+    print( "Delete Path           : -del <path> (ext)" )
+    print( "Collected File Clear  : -empty" )
     print( "Clear Terminal        : clear" )
     print( "Exit                  : quit(q)" )
 
@@ -99,6 +100,12 @@ def selectMenu(ex, option):
                 ex.MoveFilesForExt( option[1], option[2], option[3] )
             else:
                 ex.MoveFiles( option[1], option[2] )
+        
+        elif "-del" == option[0]:
+            if 2 < len(option):
+                pass
+            else:
+                ex.DeleteDirectory( option[1] )
 
         elif "-empty" == option[0]:
             ex.Clear()

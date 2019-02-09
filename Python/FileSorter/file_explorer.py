@@ -68,8 +68,29 @@ class FileExplorer:
     def DeleteFiles(self):
         pass
 
-    def DeleteDirectory(self):
-        pass
+    def DeleteDirectory(self, delPath):
+        try:
+            print("delete diretory : " + delPath )
+            if not delPath in self.files.keys() or not os.path.exists(delPath):
+                print( "check path plz : ")
+                return
+
+            delDir = self.files[delPath]
+            shutil.rmtree( delPath )
+
+            for delf in delDir:
+                ext = FileInfo.strExtension( delf.ext )
+                if ext in self.fileTypes.keys():
+                    self.fileTypes[ext] -= 1
+                    if 0 > self.fileTypes[ext]:
+                        self.fileTypes[ext] = 0
+            
+
+            del self.fileDirectory[delPath]
+            del self.files[delPath]
+        
+        except Exception as e:
+            print(e)
 
     def MoveFiles(self, keyPath, targetPath):
         try:
@@ -77,7 +98,7 @@ class FileExplorer:
             targetPath = FileExplorer.replaceDirSlash(targetPath)
             print( "move file : %s, %s" %(keyPath, targetPath) )
             if not keyPath in self.fileDirectory:
-                print("none collect path : " + keyPath )
+                print( "none collect path : " + keyPath )
                 return
              
             if not os.path.exists( targetPath ):
@@ -130,8 +151,9 @@ class FileExplorer:
             if not targetPath in self.files:
                 self.files[targetPath] = list()
             
-            moveInfos = self.files[targetPath]
-            moveFiles = self.fileDirectory[targetPath]
+            dstFiles = self.files[targetPath]
+            distNames = self.fileDirectory[targetPath]
+            moveFiles = list()
 
             for mt in self.files[keyPath]:
                 if mt.ext == moveExt:
@@ -141,10 +163,15 @@ class FileExplorer:
                     mt.fullPath = dist
                     mt.path = targetPath
                     
-                    moveInfos.append( mt )
-                    moveFiles.append( mt.name )
-                    self.files[keyPath].remove( mt )
-                    self.fileDirectory[keyPath].remove( mt.name )
+                    moveFiles.append( mt )
+                    dstFiles.append( mt )
+                    distNames.append( mt.name )
+
+            for d in moveFiles:
+                if d in self.files[keyPath]:
+                    self.files[keyPath].remove( d )
+                if d.name in self.fileDirectory[keyPath]:
+                    self.fileDirectory[keyPath].remove( d.name )
 
         except Exception as e:
             print(e)
@@ -153,7 +180,7 @@ class FileExplorer:
         try:
             keyPath = FileExplorer.replaceDirSlash(keyPath)
             targetPath = FileExplorer.replaceDirSlash(targetPath)
-            print( "move file : %s, %s, %s" %(keyPath, targetPath, ext) )
+            print( "Copy file : %s, %s, %s" %(keyPath, targetPath, ext) )
             
             if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
@@ -185,60 +212,67 @@ class FileExplorer:
             print(e)
 
     async def futureWorker(self):
-        for f in asyncio.as_completed( self.fts ):
-            await f
+        try:
+            for f in asyncio.as_completed( self.fts ):
+                await f
+        except Exception as e:
+            print(e)
 
     async def progressWorker(self):
-        for t in tqdm( asyncio.as_completed(self.fts), total=len(self.fts) ):
-            await t
+        try:
+            for t in tqdm( asyncio.as_completed(self.fts), total=len(self.fts) ):
+                await t
+        except Exception as e:
+            print(e)
 
     def copyDone( self, src, dst, copied ):
-        name, ext   = os.path.splitext( dst )
-        path        = str(dst)
-        path        = path.replace( "/"+ name + ext, "" )
-        print( "copied file -> path : %s, name : %s, ext : %s, size : %d" %(path, name, ext, copied) )
-
-    def copyFileObj( self, src, dst, callback_done, length=8*1024 ):
-        with open(src, "rb") as fsrc:
-            with open(dst, "wb") as fdst:
-                copied = 0
-                while True:
-                    buf = fsrc.read(length)
-                    if not buf:
-                        break
-                    fdst.write(buf)
-                    copied += len(buf)
-                callback_done(fsrc=fsrc, fdst=fdst, copied=copied)
+        try:
+            name, ext   = os.path.splitext( dst )
+            pair        = name.split("\\")
+            name        = pair[len(pair)-1]
+            path        = pair[0]
+            
+            self.fileDirectory[path].append( name + ext )
+            self.files[path].append( FileInfo(path, name + ext) )
+            self.fileTypes[ext] += 1
+            print( "copied file -> path : %s, name : %s, ext : %s, size : %d" %(path, name, ext, copied) )
+            
+        except Exception as e:
+            print(e)
 
     async def asyncCopyFileObj( self, src, dst, callback_done, length=8*1024 ):
-        with open(src, "rb") as fsrc:
-            with open(dst, "wb") as fdst:
-                copied = 0
+        try:
+            with open(src, "rb") as fsrc:
+                with open(dst, "wb") as fdst:
+                    copied = 0
 
-                while True:
-                    buf = fsrc.read(length)
-                    if not buf:
-                        break
-                    fdst.write(buf)
-                    copied += len(buf)
+                    while True:
+                        buf = fsrc.read(length)
+                        if not buf:
+                            break
+                        fdst.write(buf)
+                        copied += len(buf)
 
-                callback_done(src=src, dst=dst, copied=copied)
+                    callback_done(src=src, dst=dst, copied=copied)
+        except Exception as e:
+            print(e)
         
     def DisplayCollectFiles(self):
-        print( "------------------ Collected Files ------------------" )
+        try:
+            print( "------------------ Collected Files ------------------" )
+            print( "<<<< Extension Type And Count >>>>")
+            for ext in self.fileTypes:
+                print("%s : %d" % (ext, self.fileTypes[ext]))
 
-        print( "<<<< Extension Type And Count >>>>")
-        for ext in self.fileTypes:
-            print("%s : %d" % (ext, self.fileTypes[ext]))
+            print( "<<<< Path Detail >>>>")
+            for key, values in self.fileDirectory.items():
+                print( "path : " + key )
 
-        print( "<<<< Path Detail >>>>")
-        for key, values in self.fileDirectory.items():
-            print( "path : " + key )
-
-            for value in values:
-                print( " - " + value )
-        
-        print( "------------------ Collected Files ------------------" )
+                for value in values:
+                    print( " - " + value )
+            print( "------------------ Collected Files ------------------" )
+        except Exception as e:
+            print(e)
 
     def DisplayCollectFilesForPath(self, path):
         if not path in self.fileDirectory:
