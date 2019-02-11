@@ -100,6 +100,7 @@ def selectMenu(ex, option):
                 ex.MoveFilesForExt( option[1], option[2], option[3] )
             else:
                 ex.MoveFiles( option[1], option[2] )
+                
         elif "-moveAll" == option[0]:
             pass
         

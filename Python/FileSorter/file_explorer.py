@@ -176,6 +176,45 @@ class FileExplorer:
         except Exception as e:
             print(e)
 
+    def MoveAll( self, dst, ext ):
+        try:
+            if not os.path.exists( dst ):
+                print( "make directory : " + dst )
+                os.mkdir( dst )
+            
+            moveExt = FileInfo.enumExtension(ext.lower())
+
+            if not dst in self.fileDirectory:
+                self.fileDirectory[dst] = list()
+
+            if not dst in self.files:
+                self.files[dst] = list()
+            
+            dstFiles = self.files[dst]
+            distNames = self.fileDirectory[dst]
+            moveFiles = list()
+
+            for key, fs in self.files:
+                for f in fs:
+                    if f.ext == moveExt:
+                        dist = os.path.join( dst, f.name )
+                        shutil.move( f.fullPath, dist )
+
+                        f.fullPath = dist
+                        f.path = dst
+                        
+                        moveFiles.append( f )
+                        dstFiles.append( f )
+                        distNames.append( f.name )
+
+            # 이거 어떡하지???? 이전 파일도 제거 해야되는데...
+            # for d in moveFiles:
+            #     for 
+
+
+        except Exception as e:
+            print(e)
+
     def CopyFilesForExt(self, keyPath, targetPath, ext):
         try:
             keyPath = FileExplorer.replaceDirSlash(keyPath)
