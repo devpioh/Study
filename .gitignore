@@ -3,6 +3,7 @@
 *.gz
 *.pyc
 __pycache__/
+*.log
 
 #visual studo#
 *.vs
@@ -19,3 +20,16 @@ Library
 Temp
 test
 
+#Android Studio#
+*.apk
+*.ap_
+*.dex
+*.iml
+captures/
+bin/
+gen/
+.navigation/
+.idea/
+.idea/*
+.idea/workspace.xml
+.idea/libraries
