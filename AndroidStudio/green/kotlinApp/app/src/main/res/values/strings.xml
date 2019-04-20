@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">kotlinApp</string>
+    <string name="touch_clear">touch clear</string>
+    <string name="image_change">image change</string>
+</resources>
