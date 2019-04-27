@@ -21,15 +21,17 @@ class D0420_Lifecycle : AppCompatActivity()
     }
 
     override fun onStop() {
-        super.onStop()
 
         showToast( "Call ------------ onStop()" );
+
+        super.onStop()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
 
         showToast( "Call ------------ onDestroy()" );
+
+        super.onDestroy()
     }
 
 

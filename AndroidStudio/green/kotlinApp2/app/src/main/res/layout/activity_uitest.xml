@@ -5,6 +5,36 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".UITest">
+        tools:context=".UITest_Activity">
 
+    <Button
+            android:text="Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_utilitytest"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintVertical_bias="0.036"/>
+    <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/uitest_seekbar" android:max="100"
+            app:layout_constraintTop_toBottomOf="@+id/btn_utilitytest"
+            app:layout_constraintBottom_toBottomOf="@id/uitest_progress"
+            app:layout_constraintVertical_bias="0.51"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/uitest_progress" android:max="100"
+            app:layout_constraintTop_toBottomOf="@id/uitest_seekbar"
+            app:layout_constraintBottom_toTopOf="@id/uitest_txtview" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp"
+            android:id="@+id/uitest_txtview" app:layout_constraintTop_toBottomOf="@id/uitest_progress"
+            app:layout_constraintRight_toRightOf="parent" app:layout_constraintLeft_toLeftOf="parent"
+    />
 </android.support.constraint.ConstraintLayout>
