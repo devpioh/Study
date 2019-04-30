@@ -5,6 +5,8 @@ import shutil
 import asyncio
 from tqdm import tqdm
 from file_structure import *
+from file_regex import StringConverter
+from file_regex import NationCode
 
 class FileExplorer:
     @staticmethod
@@ -19,16 +21,18 @@ class FileExplorer:
         self.fileDirectory = dict()
         self.fileTypes = dict()
         self.files = dict()
+        self.localeFiles = dict()
+        self.fts = list()
         self.reportName = "SearchReport.txt"
         self.statingDir = ""
         self.loop = asyncio.get_event_loop()
-        self.fts = list()
     
     def Clear(self):
         self.fileDirectory.clear()
         self.fileTypes.clear()
         self.files.clear()
         self.fts.clear()
+        self.localeFiles.clear()
         self.statingDir = ""
         self.loop.close()
 
@@ -59,8 +63,25 @@ class FileExplorer:
                         if not ext in self.fileTypes:
                             self.fileTypes[ext] = int()
 
+                        fInfo = FileInfo( path, filename )
                         self.fileTypes[ext] += 1
-                        self.files[path].append( FileInfo( path, filename ) )
+                        self.files[path].append( fInfo )
+
+                        localeCode = NationCode.none
+                        if NationCode.isNation( fInfo.localeCode, NationCode.ko.value ):
+                           localeCode = NationCode.ko
+                        elif NationCode.isNation( fInfo.localeCode, NationCode.jp.value ):
+                            localeCode = NationCode.jp
+                        elif NationCode.isNation( fInfo.localeCode, NationCode.ch.value ):
+                            localeCode = NationCode.ch
+                        else:
+                            localeCode = NationCode.en
+                        
+                        if not localeCode is NationCode.none:
+                            if not localeCode in self.localeFiles:
+                                self.localeFiles[localeCode] = list()
+                            
+                            self.localeFiles[localeCode].append( fInfo )
 
             except Exception as e:
                 print(e)
@@ -79,7 +100,7 @@ class FileExplorer:
             shutil.rmtree( delPath )
 
             for delf in delDir:
-                ext = FileInfo.strExtension( delf.ext )
+                ext = FileExt.strExtension( delf.ext )
                 if ext in self.fileTypes.keys():
                     self.fileTypes[ext] -= 1
                     if 0 > self.fileTypes[ext]:
@@ -135,15 +156,15 @@ class FileExplorer:
             if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
                 return
-            elif FileExt.none == FileInfo.enumExtension(ext.lower()):
-                print("none collect ext : %s" %  FileInfo.enumExtension(ext.lower()) )
+            elif FileExt.none == FileExt.enumExtension(ext.lower()):
+                print("none collect ext : %s" %  FileExt.enumExtension(ext.lower()) )
                 return
              
             if not os.path.exists( targetPath ):
                 print( "make directory : " + targetPath )
                 os.mkdir( targetPath )
 
-            moveExt = FileInfo.enumExtension(ext.lower())
+            moveExt = FileExt.enumExtension(ext.lower())
 
             if not targetPath in self.fileDirectory:
                 self.fileDirectory[targetPath] = list()
@@ -182,19 +203,12 @@ class FileExplorer:
                 print( "make directory : " + dst )
                 os.mkdir( dst )
             
-            moveExt = FileInfo.enumExtension(ext.lower())
+            moveExt = FileExt.enumExtension(ext.lower())     
+            dstFiles = list()
+            dstNames = list()
+            delfiles = dict()
 
-            if not dst in self.fileDirectory:
-                self.fileDirectory[dst] = list()
-
-            if not dst in self.files:
-                self.files[dst] = list()
-            
-            dstFiles = self.files[dst]
-            distNames = self.fileDirectory[dst]
-            moveFiles = list()
-
-            for key, fs in self.files:
+            for key, fs in self.files.items():
                 for f in fs:
                     if f.ext == moveExt:
                         dist = os.path.join( dst, f.name )
@@ -203,14 +217,27 @@ class FileExplorer:
                         f.fullPath = dist
                         f.path = dst
                         
-                        moveFiles.append( f )
+                        delfiles[f] = key
                         dstFiles.append( f )
-                        distNames.append( f.name )
+                        dstNames.append( f.name )
+                        
+            for kFile, vPath in delfiles.items():
+                if vPath in self.files:
+                    if kFile in self.files[vPath]:
+                        self.files[vPath].remove( kFile )
+                if vPath in self.fileDirectory:
+                    if kFile.name in self.fileDirectory[vPath]:
+                        self.fileDirectory[vPath].remove( kFile.name )
 
-            # 이거 어떡하지???? 이전 파일도 제거 해야되는데...
-            # for d in moveFiles:
-            #     for 
-
+            if dst in self.files:
+                self.files[dst].extend( dstFiles )
+            else:
+                self.files[dst] = dstFiles
+            
+            if dst in self.fileDirectory:
+                self.fileDirectory[dst].extend( dstFiles )
+            else:
+                self.fileDirectory[dst] = dstFiles
 
         except Exception as e:
             print(e)
@@ -224,15 +251,15 @@ class FileExplorer:
             if not keyPath in self.fileDirectory:
                 print("none collect path : " + keyPath )
                 return
-            elif FileExt.none == FileInfo.enumExtension(ext.lower()):
-                print("none collect ext : %s" %  FileInfo.enumExtension(ext.lower()) )
+            elif FileExt.none == FileExt.enumExtension(ext.lower()):
+                print("none collect ext : %s" %  FileExt.enumExtension(ext.lower()) )
                 return
              
             if not os.path.exists( targetPath ):
                 print( "make directory : " + targetPath )
                 os.mkdir( targetPath )
 
-            moveExt = FileInfo.enumExtension(ext.lower())
+            moveExt = FileExt.enumExtension(ext.lower())
 
             if not targetPath in self.fileDirectory:
                 self.fileDirectory[targetPath] = list()
@@ -349,7 +376,7 @@ class FileExplorer:
                     types[info.ext] += 1
             
             for ext in types:
-                print( "%s : %d" % (FileInfo.strExtension(ext), types[ext]))
+                print( "%s : %d" % (FileExt.strExtension(ext), types[ext]))
         print( "------------------ Collected Extension ------------------" )
     
     def DisplayCollectDetail(self):
@@ -359,6 +386,20 @@ class FileExplorer:
             for item in v:
                 print( item.toStr() )
         print( "------------------ Collected Detail ------------------" )
+    
+
+    def DisplayCollectLocale(self, localeCode):
+        print( "------------------ Collected Locale Info ------------------" )
+        if None == localeCode or "" == localeCode:
+            for lo in self.localeFiles:
+                print( "{0} : {1}".format(lo, len( self.localeFiles[lo] )) )
+        else:
+            lo = NationCode.strToNationCode( localeCode )
+            print( "{0} : {1}".format(lo, len( self.localeFiles[lo] )) )
+
+
+        print( "------------------ Collected Locale Info ------------------" )
+
         
     def ExportSearchReport(self, exportPath):
         try:

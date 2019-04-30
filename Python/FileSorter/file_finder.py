@@ -13,9 +13,10 @@ def displayMenu():
     print("-------------- Menu --------------")
     print( "System terminal       : -sys (ls, ...)" )
     print( "Collecting File       : -col <dir>" )
-    print( "Display info          : -view (file <dir>, dir, ext <dir>)" )
+    print( "Display info          : -view (file <dir>, dir, ext <dir>, detail, locale, locale <locode>)" )
     print( "Copy Files            : -copy <src> <dst> <ext>" )
     print( "Move Collected File   : -move <src> <dst> (ext)" )
+    print( "MoveAll File ext      : -moveAll <dst> (ext)" )
     print( "Delete Path           : -del <path> (ext)" )
     print( "Collected File Clear  : -empty" )
     print( "Clear Terminal        : clear" )
@@ -92,6 +93,12 @@ def selectMenu(ex, option):
             elif "detail" == option[1]:
                 ex.DisplayCollectDetail()
 
+            elif "locale" == option[1]:
+                if 2 < len( option ):
+                    ex.DisplayCollectLocale( option[2] )
+                else:
+                    ex.DisplayCollectLocale( None )
+
         elif "-copy" == option[0]:
             ex.CopyFilesForExt( option[1], option[2], option[3] )
 
@@ -102,7 +109,7 @@ def selectMenu(ex, option):
                 ex.MoveFiles( option[1], option[2] )
                 
         elif "-moveAll" == option[0]:
-            pass
+            ex.MoveAll( option[1], option[2] )
         
         elif "-del" == option[0]:
             if 2 < len(option):
