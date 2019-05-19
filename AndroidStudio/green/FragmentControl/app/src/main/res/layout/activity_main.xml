@@ -6,16 +6,4 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity" android:id="@+id/container">
 
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="I am main Activity"-->
-    <!--android:textSize="30sp"/>-->
-
-    <fragment
-            android:id="@+id/fragment_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:name="com.green.fragmentcontrol.MainFragment"/>
-
 </RelativeLayout>

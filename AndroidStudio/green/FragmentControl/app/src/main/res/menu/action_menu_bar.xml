@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/refresh_action"
+        android:icon="@drawable/refresh_action_menu"
+        android:title="Refresh"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/setting_action"
+          android:icon="@drawable/setting_action_menu"
+          android:title="Setting"
+          app:showAsAction="always"/>
+
+    <!--<item android:id="@+id/search_action"-->
+          <!--android:icon="@drawable/search_action_menu"-->
+          <!--android:title="Search"-->
+          <!--app:showAsAction="always"/>-->
+    <item android:id="@+id/menu_search"
+        android:title="Search"
+        android:orderInCategory="102"
+        app:showAsAction="always|withText"
+        app:actionLayout="@layout/search_text_lable"/>
+
+
 
 </menu>
