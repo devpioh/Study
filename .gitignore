@@ -42,3 +42,7 @@ out/
 .idea/*
 .idea/workspace.xml
 .idea/libraries
+
+#Node.js
+node_modules
+node_modules/*
