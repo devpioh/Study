@@ -7,7 +7,7 @@
   4. 명령 대기열과 명령 목록 할당자, 그리고 메인 명령 목록을 생성.
   5. 교환 사술을 서술 하고 생성.
   6. 응용 프로그램에 필요한 서술사 힙들을 생성.
-  7. 후면 버퍼의 크기를 설정하고, 후면 버퍼에 대한 렌더 대상 뷰를 생성.
+  7. 후면 버퍼의 크기를 설정하고, 후면 버퍼에 대한 렌더 타겟 뷰를 생성.
   8. 깊이/스텐실 버퍼 생성하고, 그와 연관된 깊이/스텐실 뷰를 생성한다.
   9. 뷰포트와 가위 판정용 사각형(scissor rectangle) 설정
 <br>
@@ -139,4 +139,107 @@
 
 ### 6. 서술자 힙 생성
  + 서술자 힙은 서술자의 종류마다 따로 생성
- + 
+   ```c++
+   ex)
+   ComPtr<ID3D12DescriptorHeap> mRtvHeap; // 렌더 타겟 힙
+   ComPtr<ID3D12DescriptorHeap> mDsvHeap; // 깊이/스텐실 힙
+   void D3DApp::CreateRtvAndDsvDescriptorHeaps()
+   {
+     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
+     rtvHeapDesc.NumDescriptors = SwapChainBufferCount; // 교환 사슬 버퍼 수만큼 서술자 힙을 만든다.
+     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+     rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+     rtvHeapDesc.NodeMask = 0;
+     
+     ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(mRtvHeap.GetAddressOf())));
+     D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+     dsvHeapDesc.NumDescriptors = 1;
+     dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+     dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+     dsvHeapDesc.NodeMask = 0;
+     ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
+     
+   }
+   ```
+ + 서술자 힙 접근
+   ```c++
+   ex)
+   D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const
+   {
+     // 편의를 위해 CD3DX12_CPU_DESCRIPTOR_HANDLE의 생성자를 사용
+     // 이 생성자는 주어진 오프셋에 해당하는 후면 버퍼 RTV 핸들(D3D12_CPU_DESCRIPTOR_HANDLE)을 리턴
+     return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+       mRtvHeap->GetCPUDescriptorHandleForHeapStart(),    // 첫 핸들
+       mCurrentBackBuffer,                                // 오프셋 색인
+       mRtvDescriptorSize);                               // 서술자 바이트 크기
+   }
+
+   D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const
+   {
+     return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
+   }
+   ```
+<br>
+
+### 6.렌더 타겟 뷰(RTV) 생성
+ + 자원은 직접 파이프라인 단계에서 묶지 않고, 반드시 자원에 대한 뷰(서술자)를 생성해서 그 뷰를 파이프라인 단계에서 묶는다.
+ + 특히, 후면 버퍼를 파이프라인의 출력 병합기(output merger) 단계에 묶으려면 후면 버퍼에 대한 렌더 타겟 뷰를 생성.
+ + 교환 사슬에 저장된 버퍼 자원 접근
+   ```c++
+   HRESULT IDXGISwapChain::GetBuffer(
+     UINT Buffer,         // 얻고자 하는 특정 후면 버퍼를 식별하는 색인(교환 사슬이 여러 개일 경우 버퍼 정보 필요)
+     FEFIID riid,         // 얻고자 후면 버퍼를 나타내는 ID3D12Resource 인터페이스 COM ID
+     void **ppSurface     // 얻고자 하는 후면버퍼의 ID3D12Resource 형의 포인터
+   );
+   ```
+   - IDXGISwapChain::GetBuffer()를 호출하면 해당 후면 버퍼의 COM 참조 횟수가 증가 한다.
+   - 버퍼 사용 후에는 반드시 해제 해야되므로, ComPtr을 사용하면 해제가 자동으로 되니 적극 활용.
+ + 렌더 타멧 뷰 생성
+   ```c++
+   void ID3D12Device::CreateRenderTargetView(
+     ID3D12Resource *pResource,                   // 렌더 타켓으로 사용항 자원을 가르키는 포인터(지금은 후면버퍼)
+     const D3D12_RENDER_TARGET_VIEW_DESC *pDesc,  // D3D12_RENDER_TARGET_VIEW_DESC를 가리키는 포인터
+     D3D12_CPU_DESCRIPTOR_HANDLE DestDescriptor   // 생성된 렌더 타겟 뷰가 저장될 서술자 핸들
+   )
+   ```
+   - D3D12_RENDER_TARGET_VIEW_DESC
+     - 렌더 타겟 뷰를 서술하는 구조체
+     - 자원에 담긴 원소들의 자료형식에 관한 멤버 보유
+     - 구체적인 자료 형식을 지정해서 자원을 생성했다면 널 포인터로 지정 해도 된다.
+  + 렌더 타겟 뷰 생성 예제
+    ```c++
+    ex)
+    ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
+    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle( mRtvHeap->getCPUDescriptorHandleForHeapStart() );
+
+    for(UINT i = 0; i < SwapChainBufferCount; i++)
+    {
+      // 교환 사슬의 i번째 버퍼를 얻는다.
+      ThrowIfFailed( mSwapChain->GetBuffer(i, IID_PPV_ARGS(&mSwapChainBuffer[i])) );
+
+      // 그 버퍼에 대한 RTV를 생성한다.
+      md3dDevice->CreateRenderTargetView( mSwapChainBuffer[i].Get(), nullptr, rtvHeapHandle );
+
+      // 힙의 다음 항목으로 넘어간다.
+      rtvHeapHandle.Offset(1, mRtvDescriptorSize);
+    }
+    ```
+<br>
+
+### 7. 깊이/스텐실 버퍼와 뷰 생성
+ + D3D12_RESOURCE_DESC
+   ```c++
+   typedef struct D3D12_RESOURCE_DESC
+   {
+     D3D12_RESOURCE_DIMENSION Dimension; // 열거형 D3D12_RESOURCE_DIMENTION 값중 하나를 세팅
+     UINT64 Alignment;
+     UINT64 Width;  // 텍스처의 넓이(텍셀 단위). 버퍼 자원의 경우에는 버퍼의 바이트 개수를 지정
+     UINT Height;   // 텍스처의 높이(텍셀 단위)
+     UINT16 DepthOrArraySize; // 3차원 텍스처의 깊이(텍셀 단위) 또는 1 or 2차원 텍스처 배열 크기. 3차원 텍스처들의 배열은 지원 X
+     UINT16 MipLevels;
+     DXGI_FORMAT Format;
+     DXGI_SAMPLE_DESC SampleDesc;
+     D3D12_TEXTURE_LAYOUT Layout;
+     D3D12_RESOURCE_MISC_FLAG MiscFlags;
+   } D3D12_RESOURCE_DESC;
+   ```
