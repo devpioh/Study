@@ -9,7 +9,7 @@
   6. 응용 프로그램에 필요한 서술사 힙들을 생성.
   7. 후면 버퍼의 크기를 설정하고, 후면 버퍼에 대한 렌더 타겟 뷰를 생성.
   8. 깊이/스텐실 버퍼 생성하고, 그와 연관된 깊이/스텐실 뷰를 생성한다.
-  9. 뷰포트와 가위 판정용 사각형(scissor rectangle) 설정
+  9. 뷰포트와 가위 판정용 사각형(scissor rectangle) 설정.
 <br>
 <br>
 
@@ -79,17 +79,20 @@
      queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
      queueDesc.Flag = D3D12_COMMAND_QUEUE_FLAG_NONE;
 
+     // 명령 대기열 생성
      ThrowIfFailed(md3dDevice->CreateCommandQueue( &queueDesc, IID_PPV_ARGS(&mCommandQueue)));
 
+     // 명령 할당자 생성
      ThrowIfFailed(md3dDevice->CreateCommandAllocator( 
          D3D12_COMMAND_LIST_TYPE_DIRECT,
          IID_PPV_ARGS(&mDirectCmdListAlloc) ));
-
+     
+     // 명령 목록 생성
      ThrowIfFailed(md3dDevice->CreateCommandList(
          0,
          D3D12_COMMAND_LIST_TYPE_DIRECT,
          mDirectCmdListAlloc.Get(),      // 연관된 명령 할당자
-         nullptr,                               // 초기 파이프 라인 상태 객체
+         nullptr,                        // 초기 파이프 라인 상태 객체
          IID_PPV_ARGS(mCommandList.GetAddressOf())
      ));
 
@@ -105,12 +108,12 @@
    ```c++
    typedef struct DXGI_SWAP_CHAIN_DESC
    {
-       DXGI_MODE_DESC BufferDesc;     // 후면 버퍼의 속성들을 정의하는 구조체
+       DXGI_MODE_DESC BufferDesc;   // 후면 버퍼의 속성들을 정의하는 구조체
        DXGI_SAMPLE_DESC SampleDesc; // 다중 표본화 표본 갯수와 품질 수준을 서술
-       DXGI_USAGE BufferUsage;          // 후면 버퍼를 렌더 대상으로 사용하는지 설정
-       UINT BufferCount;                    // 교환 사슬이 사용할 버퍼의 개수, 이중 버퍼링일 경우 2로 세팅
-       HWND OutputWindow;             // 렌더링 결과가 표시될 창의 핸들
-       BOOL Windowed;                     // 창 모드이면 true, 전체 화면 모드이면 false
+       DXGI_USAGE BufferUsage;      // 후면 버퍼를 렌더 대상으로 사용하는지 설정
+       UINT BufferCount;            // 교환 사슬이 사용할 버퍼의 개수, 이중 버퍼링일 경우 2로 세팅
+       HWND OutputWindow;           // 렌더링 결과가 표시될 창의 핸들
+       BOOL Windowed;               // 창 모드이면 true, 전체 화면 모드이면 false
        DXGI_SWAP_EFFECT SwapEffect; 
        UINT Flags; // 추가 플래그, DXGI_SWAP_CHAIN_FLAG_ALLOW_SWITCH를 지정 시 전체화면으로 세팅될때 적절한 크기로 세팅된다.
    } DXGI_SWAP_CHAIN_DESC;
@@ -130,9 +133,9 @@
  + IDXGIFactory::CreateSwapChain
    ```c++
    HRESULT IDXGIFactory::CreateSwapChain(
-       IUnknown *pDevice,                       // ID3D12CommandQueue 포인터
+       IUnknown *pDevice,               // ID3D12CommandQueue 포인터
        DXGI_SWAP_CHAIN_DESC *pDesc,     // 교환 사슬 서술 구조체 포인터
-       IDXGISwapChain **ppSwapChain       // 생성된 교환 사슬 인터페이스 포인터
+       IDXGISwapChain **ppSwapChain     // 생성된 교환 사슬 인터페이스 포인터
    );
    ```
 <br>
@@ -152,11 +155,13 @@
      rtvHeapDesc.NodeMask = 0;
      
      ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(mRtvHeap.GetAddressOf())));
+
      D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
      dsvHeapDesc.NumDescriptors = 1;
      dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
      dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
      dsvHeapDesc.NodeMask = 0;
+
      ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
      
    }
