@@ -33,22 +33,22 @@ void main()
 ```
 // result[0]        = arrayA[0] + arrayB[0];
 mov     tmp, [arrayA]
-add      tmp, [arrayB]
+add     tmp, [arrayB]
 mov     [result], tmp
 
 // result[1]        = arrayA[1] + arrayB[1];
 mov     tmp, [arrayA+1]
-add      tmp, [arrayB+1]
+add     tmp, [arrayB+1]
 mov     [result+1], tmp
 
 // result[2]        = arrayA[2] + arrayB[2];
 mov     tmp, [arrayA+2]
-add      tmp, [arrayB+2]
+add     tmp, [arrayB+2]
 mov     [result+2], tmp
 
 // result[3]        = arrayA[3] + arrayB[3];
 mov     tmp, [arrayA+3]
-add      tmp, [arrayB+3]
+add     tmp, [arrayB+3]
 mov     [result+3], tmp
 ```
 
@@ -64,8 +64,8 @@ void main()
     __declspec(align(16)) int arrayB[4]   = { 4, 5, 6, 7 };
     __declspec(align(16)) int result[4]    = { 0, };
 
-    __m128i xmm0            = _mm_load_si128((__m128i*)arrayA);
-    __m128i xmm1            = _mm_load_si128((__m128i*)arrayB);
+    __m128i xmm0           = _mm_load_si128((__m128i*)arrayA);
+    __m128i xmm1           = _mm_load_si128((__m128i*)arrayB);
     __m128i xmmResult      = _mm_add_epi32(xmm0, xmm1);
     _mm_store_si128((__m128i*)result, xmmResult);
 
@@ -78,7 +78,7 @@ void main()
 ```
 movdqa     xmm0, arrayA         // __m128i xmm0            = _mm_load_si128((__m128i*)arrayA);
 movdqa     xmm1, arrayB         // __m128i xmm1            = _mm_load_si128((__m128i*)arrayB);
-paddd       xmm0, xmm1         // __m128i xmmResult      = _mm_add_epi32(xmm0, xmm1);
+paddd      xmm0, xmm1           // __m128i xmmResult       = _mm_add_epi32(xmm0, xmm1);
 movdqa     result,  xmm0        // _mm_store_si128((__m128i*)result, xmmResult);
 ```
  3번의 이동 연산과 1번의 덧셈 연산이 실행된다. 하지만 SISD와는 다르게 각 요소별로 덧셈이 이뤄지지 않고 한번에 덧셈 연산이 실행되어 총 연산 횟수는 4번이다. 

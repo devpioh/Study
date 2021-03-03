@@ -248,3 +248,7 @@
      D3D12_RESOURCE_MISC_FLAG MiscFlags;
    } D3D12_RESOURCE_DESC;
    ```
+<br>
+
+### 8. 뷰포트와 가위 판정용 사각형(scissor rectangle) 설정
+  
