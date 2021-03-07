@@ -19,17 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Engine\Helper\CommonHelper.h" />
+    <ClInclude Include="..\..\..\Engine\Helper\Log.h" />
     <ClInclude Include="..\..\..\Engine\pch.h" />
     <ClInclude Include="..\..\..\Engine\System\D3DApp.h" />
     <ClInclude Include="..\..\..\Engine\System\WinApp.h" />
+    <ClInclude Include="SimpleWin.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Engine\Helper\Log.cpp" />
     <ClCompile Include="..\..\..\Engine\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\System\D3DApp.cpp" />
     <ClCompile Include="..\..\..\Engine\System\WinApp.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SimpleWin.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -85,7 +90,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(DX_ENGINE);$(IncludePath)</IncludePath>
+    <IncludePath>$(DX_ENGINE);$(DX_UTIL)directx-headers\include\directx\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

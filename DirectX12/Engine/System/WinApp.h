@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+#include "pch.h"
 
 namespace DX12PE
 {
@@ -16,13 +16,15 @@ namespace DX12PE
 	class WinApp
 	{
 	public:
-		static WinApp* GetApp()					{ return winApp; }
-		inline HINSTANCE AppInst() const		{ return hInst; }
-		inline HWND AppHandle() const			{ return hWnd; }
-		inline int	GetWinDisplayState() const	{ return winDisplayState; }
+		static WinApp* GetApp()				{ return mWinApp; }
+	
+		HINSTANCE AppInst() const			{ return mhInst; }
+		HWND AppHandle() const				{ return mhWnd; }
+		int GetWinDisplayState() const		{ return mWinDisplayState; }
+		void SetWinDisplayState(int state)	{ mWinDisplayState = state; }
+		virtual float AspectRatio() const	{ return static_cast<float>(mWinWidth) / mWinHeight; }
+	
 
-
-		int SetWinDisplayState(int flag);
 		virtual LRESULT CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
 	protected:
@@ -34,11 +36,16 @@ namespace DX12PE
 		virtual bool InitWindow();
 
 	protected:
-		static WinApp* winApp;
-		HINSTANCE hInst;
-		HWND hWnd;
+		static WinApp*		mWinApp;
+		HINSTANCE			mhInst;
+		HWND				mhWnd;
 
-		int winDisplayState;
+
+		std::wstring mWinClassName		= L"MyWinApp";
+		std::wstring mWinCaption		= L"MyWinApplication";
+		int mWinDisplayState			= WIN_DISPLAY_STATE::e_ACTIVE;
+		int mWinWidth					= 800;
+		int mWinHeight					= 600;
 	};
 }
 

@@ -24,6 +24,15 @@
     <ClInclude Include="..\..\..\Engine\pch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleWin.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Helper\CommonHelper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Helper\Log.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Engine\System\WinApp.cpp">
@@ -36,6 +45,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\System\D3DApp.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleWin.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Helper\Log.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,7 +7,6 @@ public:
 	InitWin(HINSTANCE hinst) : WinApp(hinst)
 	{
 		InitWindow();
-		winApp = this;
 	}
 
 	~InitWin() {};
