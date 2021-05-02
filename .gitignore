@@ -15,10 +15,11 @@ Debug
 #Unity#
 *.sln
 obj
-.vscode
-Library
-Temp
-test
+.vscode/
+Library/
+Temp/
+test/
+UnityGenerated/
 
 #Android Studio#
 *.apk
