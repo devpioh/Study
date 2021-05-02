@@ -12,6 +12,8 @@ namespace DX12PE
 	class D3DApp : public WinApp
 	{
 	public:
+		virtual bool Initialize();
+
 		int Run();
 
 		bool CheckSupport4XMASAA() const		{ return 0 < m4xMASSQuality; }
@@ -62,11 +64,13 @@ namespace DX12PE
 			return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
 		}
 
+
+		//[todo] : move to helper
 		void CalcFrameState();
-		
 		void LogAdapters();
 		void LogAdapterOuputs(IDXGIAdapter* adapter);
 		void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
+		///
 
 	protected:
 		Microsoft::WRL::ComPtr<IDXGIFactory4>				mDxgiFactory;
@@ -90,6 +94,7 @@ namespace DX12PE
 		DXGI_FORMAT			mBackBufferFormat		= DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_FORMAT			mDepthStencilFormat		= DXGI_FORMAT_D24_UNORM_S8_UINT;
 
+		UINT64				mCurrentFence			= 0;
 		UINT				mRtvDescriptorSize		= 0;
 		UINT				mDsvDescriptorSize		= 0;
 		UINT				mCbvSrvDescriptorSize	= 0;

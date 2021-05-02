@@ -18,30 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Engine\Helper\CommonHelper.h" />
-    <ClInclude Include="..\..\..\Engine\Helper\Log.h" />
-    <ClInclude Include="..\..\..\Engine\pch.h" />
-    <ClInclude Include="..\..\..\Engine\System\D3DApp.h" />
-    <ClInclude Include="..\..\..\Engine\System\WinApp.h" />
-    <ClInclude Include="InitD3DApp.h" />
-    <ClInclude Include="SimpleWin.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\Engine\Helper\Log.cpp" />
-    <ClCompile Include="..\..\..\Engine\pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Engine\System\D3DApp.cpp" />
-    <ClCompile Include="..\..\..\Engine\System\WinApp.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SimpleWin.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8fa27a03-d7e7-4f02-b705-5129865618cf}</ProjectGuid>
-    <RootNamespace>InitDX12</RootNamespace>
+    <ProjectGuid>{12394b03-d070-49c6-9155-8e2d1058067c}</ProjectGuid>
+    <RootNamespace>MakeMyLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -91,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(DX_ENGINE);$(DX_UTIL)directx-headers\include\directx\;$(IncludePath)</IncludePath>
+    <IncludePath>$(DX_ENGINE);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -107,13 +88,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -161,6 +140,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Engine\Helper\Time.cpp" />
+    <ClCompile Include="..\..\..\Common\GameTimer.cpp" />
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Engine\Helper\Time.h" />
+    <ClInclude Include="..\..\..\Common\GameTimer.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

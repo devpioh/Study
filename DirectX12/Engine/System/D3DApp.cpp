@@ -17,6 +17,21 @@ D3DApp::~D3DApp()
 		FlushCommandQueue();
 }
 
+bool D3DApp::Initialize()
+{
+	if (!InitWindow())
+		return false;
+
+	if (!InitDirect3D())
+		return false;
+
+	CreateCommandObjects();
+
+	CreateSwapChain();
+
+	return true;
+}
+
 bool D3DApp::InitDirect3D()
 {
 	// active d3d debug layer
@@ -70,8 +85,6 @@ void D3DApp::CreateCommandObjects()
 		nullptr,
 		IID_PPV_ARGS(mCommandList.GetAddressOf())));
 
-
-	
 	mCommandList->Close();
 }
 
@@ -104,9 +117,20 @@ void D3DApp::CreateSwapChain()
 
 void D3DApp::FlushCommandQueue()
 {
+	mCurrentFence++;
 
+	ThrowIfFailed(mCommandQueue->Signal(mFence.Get(), mCurrentFence));
+
+	if (mCurrentFence > mFence->GetCompletedValue())
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+
+		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
+
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
 }
-
 
 int D3DApp::Run()
 {
@@ -218,9 +242,102 @@ void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 	}
 }
 
+//[todo] : move to helper
+void D3DApp::CalcFrameState()
+{
+	static int frameCount			= 0;
+	static float timeElapsed		= 0.0f;
+
+	if (1.0f <= (mClock.TotalTime() - timeElapsed))
+	{
+		float fps					= (float)frameCount; // fps = frameCount / 1
+		float mspf					= 1000.0f / fps;
+
+		std::wstring fpsStr			= std::to_wstring(fps);
+		std::wstring mspfStr		= std::to_wstring(mspf);
+		std::wstring displayInfo	= L"	FPS : " + fpsStr + L"	MSPF : " + mspfStr;
+
+		//[todo]
+		SetWindowText(mhWnd, displayInfo.c_str());
+
+		frameCount					= 0;
+		timeElapsed					+= 1.0f;
+	}
+}
 
 LRESULT CALLBACK D3DApp::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+
+	switch (msg)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+
+	case WM_MENUCHAR:
+		return MAKELRESULT(0, MNC_CLOSE);
+
+	case WM_GETMINMAXINFO:
+		{
+			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+		}
+		return 0;
+
+	case WM_ACTIVATE:
+		{
+			UINT64 status = GetWinDisplayState();
+			if (WA_INACTIVE == LOWORD(wParam))
+			{
+				SetWinDisplayState(status | WIN_DISPLAY_STATE::e_PAUSE);
+				mClock.Stop();
+			}
+			else
+			{
+				SetWinDisplayState(status & ~WIN_DISPLAY_STATE::e_PAUSE);
+				mClock.Start();
+			}
+		}
+		return 0;
+
+	case WM_ENTERSIZEMOVE:
+		{
+			UINT64 status = GetWinDisplayState();
+			status		|= (WIN_DISPLAY_STATE::e_PAUSE | WIN_DISPLAY_STATE::e_RESIZING);
+
+			SetWinDisplayState(status);
+			mClock.Stop();
+		}
+		return 0;
+
+	case WM_EXITSIZEMOVE:
+		{
+			UINT64 status = GetWinDisplayState();
+			status		&= ~(WIN_DISPLAY_STATE::e_PAUSE | WIN_DISPLAY_STATE::e_RESIZING);
+
+			SetWinDisplayState(status);
+			mClock.Start();
+			OnResize();
+		}
+		return 0;
+
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
+	case WM_MOUSEMOVE:
+		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	}
+
 	return 0;
 }
 

@@ -2,6 +2,7 @@
 
 // win 
 #include <windows.h>
+#include <windowsx.h>
 #include <wrl.h>
 
 // dx12
