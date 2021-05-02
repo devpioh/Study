@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 namespace HexCoord
 {
-    using DevTool;
-
     public struct Hex 
     {
         public readonly int x, z, y;        // q r s
@@ -84,7 +82,7 @@ namespace HexCoord
             //return base.GetHashCode();
         }
 
-        public override string ToString()                   { return $"x : {x.ToString()}, y : {y.ToString()}, z : {z.ToString()}"; }
+        public override string ToString()                   { return $"({x.ToString()}, {y.ToString()}, {z.ToString()})"; }
 
         public static bool operator == (Hex h1, Hex h2)     { return h1.x == h2.x && h1.y == h2.y && h1.z == h2.z; }
         public static bool operator != (Hex h1, Hex h2)     { return !(h1 == h2); }

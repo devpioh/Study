@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using HexCoord;
-using DevTool;
-
 
 public class HexGrid : MonoBehaviour
 {
@@ -40,19 +38,9 @@ public class HexGrid : MonoBehaviour
     public HexCell CreateCell(int x, int z, int i)
     {
         var cell        = Instantiate<HexCell>(cellPrefab, holder.transform);
-
          //[todo] : trick, 축 정렬을 위해 아래와 같이 처리한다. (ex:1 / 2 는 연산하면 0.5f로 나와야 되지만 c#에서는 0 으로 떨어진다.)
-        cell.hex        = new Hex(x - z / 2, z);
-        cell.index      = i;
-        cell.name       = $"[{cell.index.ToString()}] : {cell.hex.ToString()}";
-
-        var pos         = cell.transform.localPosition;
-        float col       = x + ((z&1) * 0.5f); // or x + ((z * 0.5f) - z / 2);
-        pos.x           = col * (HexMeterices.innerRadius * 2f);
-        pos.z           = z * (HexMeterices.outerRadius * 1.5f) ;      
-
-        cell.transform.localPosition = pos;
-
+        cell.Init(x - z / 2, z, i);
+        
         CreateDebugText(cell);
 
         return cell;

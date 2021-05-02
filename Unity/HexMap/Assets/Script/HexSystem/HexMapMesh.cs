@@ -12,12 +12,16 @@ public class HexMapMesh : MonoBehaviour
     private List<Vector2> uvs           = new List<Vector2>();
 
     private Mesh mesh;
+    private MeshCollider meshCollider;
 
     private void Awake() 
     {
         var filter      = GetComponent<MeshFilter>();
         filter.mesh     = mesh = new Mesh();
         mesh.name       = "Hex Gird Mesh";
+
+
+        meshCollider    = gameObject.AddComponent<MeshCollider>();
     }
 
     public void Generate(List<HexCell> cells)
@@ -38,6 +42,8 @@ public class HexMapMesh : MonoBehaviour
         mesh.vertices   = vertices.ToArray();
         mesh.triangles  = triangles.ToArray();
         mesh.RecalculateNormals();
+
+        meshCollider.sharedMesh = mesh;
     }
 
     private void Generate(HexCell cell)

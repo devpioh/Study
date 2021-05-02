@@ -30,4 +30,16 @@ namespace HexCoord
             new Vector3(0f, 0f, outerRadius),
         };
     }
+
+    public static class HexCoordinate
+    {
+        public static Hex PositionToHex(Vector3 position)
+        {
+            int x = Mathf.RoundToInt( position.x / (HexMeterices.innerRadius * 2f) );
+            int z = Mathf.RoundToInt( position.z / (HexMeterices.outerRadius * 1.5f) );
+            int y = (-x) - z;
+
+            return new Hex(x, y, z);
+        }
+    }
 }

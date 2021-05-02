@@ -38,10 +38,11 @@
   <ItemGroup>
      <Compile Include="Assets\Script\HexSystem\HexGeometry.cs" />
      <Compile Include="Assets\Script\HexSystem\Hex.cs" />
-     <Compile Include="Assets\Script\Debug\DevLog.cs" />
+     <Compile Include="Assets\Script\HexSystem\DevLog.cs" />
      <Compile Include="Assets\Script\HexSystem\HexCell.cs" />
-     <Compile Include="Assets\Script\HexSystem\HexGrid.cs" />
      <Compile Include="Assets\Script\HexSystem\HexMapMesh.cs" />
+     <Compile Include="Assets\Script\HexSystem\HexGrid.cs" />
+     <Compile Include="Assets\Script\HexSystem\TourchGrid.cs" />
     <Reference Include="UnityEngine">
         <HintPath>D:/Unity/2020.3.6f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
@@ -633,11 +634,11 @@
     <Reference Include="Unity.Timeline">
         <HintPath>D:/Study/Unity/HexMap/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Mathematics.Editor">
-        <HintPath>D:/Study/Unity/HexMap/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Burst.Editor">
         <HintPath>D:/Study/Unity/HexMap/Library/ScriptAssemblies/Unity.Burst.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Mathematics.Editor">
+        <HintPath>D:/Study/Unity/HexMap/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.ScriptableBuildPipeline">
         <HintPath>D:/Study/Unity/HexMap/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.dll</HintPath>
